@@ -24,7 +24,40 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// If /:date is empty
+app.get("/api/", (req, res) => {
+  unixTime = Date.now();
+  objectTime = new Date(unixTime);
+  readableTime = objectTime.toUTCString();
 
+  res.json({"unix": unixTime, "utc": readableTime});
+});
+
+// If /:date is not empty
+app.get("/api/:date", (req, res) => {
+  date = req.params.date;
+  // Match anything other than a letter, digit or underscore
+  regex = /\W/;
+
+  // Check if date is invalid
+  if (new Date(date) == "Invalid Date" && new Date(Number(date)) == "Invalid Date") {
+    res.json({"error": "Invalid Date"});
+  } else {
+    // If any date except Unix time
+    if (regex.test(date)) {
+      objectTime = new Date(date);
+      unixTime = objectTime.getTime();
+    } else {
+      // If date is Unix time
+      unixTime = Number(date);
+      objectTime = new Date(unixTime);
+    }
+
+    readableTime = objectTime.toUTCString();
+
+    res.json({"unix": unixTime, "utc": readableTime});
+  }
+});
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
